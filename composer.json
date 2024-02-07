@@ -17,7 +17,6 @@
     ],
     "minimum-stability": "dev",
     "require": {
-      "php": ">=8.2",
-      "ext-zend-opcache": "*"
+      "php": ">=8.2"
     }
 }
