@@ -9,9 +9,9 @@
  * @copyright N0zzy
  * @since 0.1
  */
-namespace Stafred\PhpBenchmark\Services;
+namespace N0zzy\PhpBenchmark\Services;
 
-use Stafred\PhpBenchmark\Attributes\BenchmarkDefault;
+use N0zzy\PhpBenchmark\Attributes\BenchmarkDefault;
 
 /**
  * Class Arguments

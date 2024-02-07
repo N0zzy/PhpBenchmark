@@ -10,17 +10,17 @@
  * @since 0.1
  */
 
-namespace Stafred\PhpBenchmark;
+namespace N0zzy\PhpBenchmark;
 
 use ReflectionAttribute;
-use Stafred\PhpBenchmark\Attributes\Benchmark;
-use Stafred\PhpBenchmark\Attributes\BenchmarkMemory;
-use Stafred\PhpBenchmark\Attributes\BenchmarkMethod;
-use Stafred\PhpBenchmark\Services\Arguments;
-use Stafred\PhpBenchmark\Services\BufferArguments;
-use Stafred\PhpBenchmark\Services\BufferClasses;
-use Stafred\PhpBenchmark\Services\BufferMethods;
-use Stafred\PhpBenchmark\Services\ResultsView;
+use N0zzy\PhpBenchmark\Attributes\Benchmark;
+use N0zzy\PhpBenchmark\Attributes\BenchmarkMemory;
+use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
+use N0zzy\PhpBenchmark\Services\Arguments;
+use N0zzy\PhpBenchmark\Services\BufferArguments;
+use N0zzy\PhpBenchmark\Services\BufferClasses;
+use N0zzy\PhpBenchmark\Services\BufferMethods;
+use N0zzy\PhpBenchmark\Services\ResultsView;
 
 /**
  * Class PhpBenchmarkBase
@@ -243,7 +243,6 @@ abstract class PhpBenchmarkBase
         for ($i = 0; $i < $args->count; $i++) {
             $memory = -1;
             $name = $method->getName();
-
 
             if ($args->memory) {
                 memory_reset_peak_usage();

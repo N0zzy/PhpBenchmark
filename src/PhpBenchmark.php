@@ -10,7 +10,7 @@
  * @since 0.1
  */
 
-namespace Stafred\PhpBenchmark;
+namespace N0zzy\PhpBenchmark;
 
 /**
  * Class PhpBenchmark

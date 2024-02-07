@@ -7,10 +7,10 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-use Stafred\PhpBenchmark\Attributes\Benchmark;
-use Stafred\PhpBenchmark\Attributes\BenchmarkMemory;
-use Stafred\PhpBenchmark\Attributes\BenchmarkMethod;
-use Stafred\PhpBenchmark\PhpBenchmark;
+use N0zzy\PhpBenchmark\Attributes\Benchmark;
+use N0zzy\PhpBenchmark\Attributes\BenchmarkMemory;
+use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
+use N0zzy\PhpBenchmark\PhpBenchmark;
 
 
 #[Benchmark( count: 10 )]

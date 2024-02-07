@@ -10,7 +10,7 @@
  * @since 0.1
  */
 
-namespace Stafred\PhpBenchmark\Attributes;
+namespace N0zzy\PhpBenchmark\Attributes;
 
 /**
  * Class BenchmarkDefault

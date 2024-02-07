@@ -10,7 +10,7 @@
  * @since 0.1
  */
 
-namespace Stafred\PhpBenchmark\Services;
+namespace N0zzy\PhpBenchmark\Services;
 
 /**
  * Class ResultsView
