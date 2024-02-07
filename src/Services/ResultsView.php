@@ -194,7 +194,7 @@ class ResultsView
     )
     : string
     {
-        $timeSec = $timeNSec/1000000;
+        $timeSec = $timeNSec/1000000000;
         if (is_float($timeNSec)) {
             $timeNSec = $this->roundNumber($timeNSec);
         }
@@ -219,8 +219,10 @@ class ResultsView
             return round($number, 2);
         } elseif ($number >= 10) {
             return round($number, 3);
-        } else {
+        } else if ($number > 0) {
             return round($number, 4);
+        } else {
+            return round($number, 5);
         }
     }
 }
