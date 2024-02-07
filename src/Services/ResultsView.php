@@ -40,13 +40,15 @@ class ResultsView
          */
         foreach ($this->buffer as $buffer) {
             $body[] = "|";
+            $arrClassName = explode("\\", $buffer->classFullName);
+
             array_map( function ($arr) use (&$body) {
                 $body[] = isset($arr[1])
                     ? $this->addWhiteSpace($arr[0], false, $arr[1])
                     : $this->addWhiteSpaceEnd($arr[0], false);
                 $body[] = "|";
             }, [
-                ["(c) " . end(explode("\\", $buffer->classFullName)), 30],
+                ["(c) " . end($arrClassName), 30],
                 [$buffer->results->memoryClass, 25],
                 [$buffer->results->countClass, 20],
                 [0],
