@@ -1,0 +1,23 @@
+{
+    "name": "stafred/phpbenchmark",
+    "description": "Simple Php Benchmark",
+    "type": "library",
+    "version": "0.1.0",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Stafred\\PhpBenchmark\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "N0zzy",
+            "email": "ffnn83@yandex.ru"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+      "php": ">=8.2",
+      "ext-zend-opcache": "*"
+    }
+}
