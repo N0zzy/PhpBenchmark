@@ -43,3 +43,12 @@ new PhpBenchmark(
         BenchmarkTest::class
 );
 ```
+
+### Results
+```text
+|__Name________________________|__Memory(kb)_____________|__Count_____________|__Time(min, s/ns)___|__Time(max, s/ns)___|__Time(avg, s/ns)___|
+|  (c) BenchmarkTest           |  0                      |  10                |                 0  |                 0  |                 0  |
+|  (m) test1                   |  0                      |  1000              |      0.0002 / 200  |  2.2835 / 2283500  |   0.0026 / 2606.7  |
+|  (m) test2                   |  0                      |  1000              |      0.0002 / 200  |  2.2799 / 2279900  |   0.0025 / 2529.2  |
+
+```
