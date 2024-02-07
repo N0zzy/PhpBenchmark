@@ -1,6 +1,4 @@
 # Simple Php Benchmark
-____
-
 
 ### Example
 
