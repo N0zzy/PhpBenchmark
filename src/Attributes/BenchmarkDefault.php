@@ -16,7 +16,7 @@ namespace Stafred\PhpBenchmark\Attributes;
  * Class BenchmarkDefault
  */
 #[\Attribute]
-class BenchmarkDefault
+final class BenchmarkDefault
 {
     /**
      * @param mixed $value

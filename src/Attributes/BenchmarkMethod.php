@@ -16,7 +16,7 @@ namespace Stafred\PhpBenchmark\Attributes;
  * Class BenchmarkMethod
  */
 #[\Attribute]
-class BenchmarkMethod
+final class BenchmarkMethod
 {
     /**
      * @param array $args

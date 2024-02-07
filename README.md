@@ -44,6 +44,11 @@ new PhpBenchmark(
 );
 ```
 
+### Run (for terminal/console)
+```text
+php your_php_script_benchmark
+```
+
 ### Results
 ```text
 |__Name________________________|__Memory(kb)_____________|__Count_____________|__Time(min, s/ns)___|__Time(max, s/ns)___|__Time(avg, s/ns)___|

@@ -15,7 +15,7 @@ namespace Stafred\PhpBenchmark\Attributes;
  * Class BenchmarkMemory
  */
 #[\Attribute]
-class BenchmarkMemory
+final class BenchmarkMemory
 {
     /**
      * @param int $limit limit memory [mb].
