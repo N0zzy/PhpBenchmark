@@ -34,7 +34,7 @@ class ResultsView
                 : $this->addWhiteSpace($arr[0]);
         }, [
             ["Name", 30],
-            ["Memory(kb)", 25],
+            ["Memory(RSS, kb)", 25],
             ["Count", 20],
             ["Time(min, s/ns)"],
             ["Time(max, s/ns)"],
@@ -70,9 +70,10 @@ class ResultsView
 
             foreach ($buffer->results->memoryMethods as $key => $value) {
                 $body[] = "|";
-                $tMin = min($buffer->results->timeMethods[$key]);
-                $tMax = max($buffer->results->timeMethods[$key]);
-                $tAvg = array_sum($buffer->results->timeMethods[$key]) / count($buffer->results->timeMethods[$key]);
+                $arrMethod = $buffer->results->timeMethods[$key];
+                $tMin = min($arrMethod);
+                $tMax = max($arrMethod);
+                $tAvg = array_sum($arrMethod) / count($arrMethod);
                 array_map( function ($arr) use (&$body) {
                     $body[] = isset($arr[1])
                         ? $this->addWhiteSpace($arr[0], false, $arr[1])
@@ -80,7 +81,7 @@ class ResultsView
                     $body[] = "|";
                 }, [
                     ["(m) " . $key, 30],
-                    [$value, 25],
+                    [$buffer->results->memoryMethods[$key], 25],
                     [$buffer->results->countMethods[$key], 20],
                     [ $this->getTimeToString($tMin) ],
                     [ $this->getTimeToString($tMax) ],
