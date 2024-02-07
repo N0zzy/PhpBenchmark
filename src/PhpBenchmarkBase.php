@@ -6,7 +6,6 @@ use ReflectionAttribute;
 use Stafred\PhpBenchmark\Attributes\Benchmark;
 use Stafred\PhpBenchmark\Attributes\BenchmarkMemory;
 use Stafred\PhpBenchmark\Attributes\BenchmarkMethod;
-use Stafred\PhpBenchmark\Attributes\BenchmarkUnlimitedTime;
 use Stafred\PhpBenchmark\Services\Arguments;
 use Stafred\PhpBenchmark\Services\BufferArguments;
 use Stafred\PhpBenchmark\Services\BufferClasses;
