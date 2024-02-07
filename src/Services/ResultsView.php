@@ -205,11 +205,11 @@ class ResultsView
     }
 
     /**
-     * @param $number
+     * @param int|float $number
      * @return float|int
      */
     private function roundNumber(
-        $number
+        int|float $number
     )
     : float|int
     {
@@ -219,10 +219,8 @@ class ResultsView
             return round($number, 2);
         } elseif ($number >= 10) {
             return round($number, 3);
-        } else if ($number > 0) {
+        }  else {
             return round($number, 4);
-        } else {
-            return round($number, 5);
         }
     }
 }
