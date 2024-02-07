@@ -44,6 +44,11 @@ new PhpBenchmark(
 );
 ```
 
+### Install (composer)
+```text
+composer require n0zzy/phpbenchmark
+```
+
 ### Run (for terminal/console)
 ```text
 php your_php_script_benchmark
