@@ -1,15 +1,26 @@
 <?php
+/**
+ * PhpBenchmark
+ * @author N0zzy <https://github.com/N0zzy>
+ * @version 0.1 2023-02-07
+ * @link https://github.com/N0zzy/PhpBenchmark
+ * @license MIT
+ * @license https://github.com/N0zzy/PhpBenchmark/blob/master/LICENSE
+ * @copyright N0zzy
+ * @since 0.1
+ */
 
 namespace Stafred\PhpBenchmark\Services;
 
+/**
+ * Class ResultsView
+ */
 class ResultsView
 {
     /**
      * @var array|BufferClasses[] $buffer
      */
     private array $buffer = [];
-
-
     /**
      * @return void
      */
@@ -88,7 +99,8 @@ class ResultsView
     public function set
     (
         array $buffer
-    ): void
+    )
+    : void
     {
         $this->buffer = $buffer;
     }
@@ -99,7 +111,12 @@ class ResultsView
      * @param int $number
      * @return string
      */
-    private function addWhiteSpace(string|int|float $str, bool $add = true, int $number = 20): string
+    private function addWhiteSpace(
+        string|int|float $str,
+        bool $add = true,
+        int $number = 20
+    )
+    : string
     {
         $this->packDataForView( $str, $separator, $length, $add);
         if (strlen($str) > 20) {
@@ -114,7 +131,12 @@ class ResultsView
      * @param int $number
      * @return string
      */
-    private function addWhiteSpaceEnd(string|int|float $str, bool $add = true, int $number = 20): string
+    private function addWhiteSpaceEnd(
+        string|int|float $str,
+        bool $add = true,
+        int $number = 20
+    )
+    : string
     {
         $this->packDataForView( $str, $separator, $length, $add, true);
         return  $this->getWhiteSpaceRepeat($separator, $length, $number) . $str;
@@ -128,7 +150,14 @@ class ResultsView
      * @param bool $reverse
      * @return void
      */
-    private function packDataForView(&$str, &$separator, &$length, bool $add, bool $reverse = false): void
+    private function packDataForView(
+        &$str,
+        &$separator,
+        &$length,
+        bool $add,
+        bool $reverse = false
+    )
+    : void
     {
         $str = !$reverse ? "__" . (string)$str : (string)$str . "__";
 
@@ -146,7 +175,12 @@ class ResultsView
      * @param $number
      * @return string
      */
-    private function getWhiteSpaceRepeat($separator, $length, $number): string
+    private function getWhiteSpaceRepeat(
+        $separator,
+        $length,
+        $number
+    )
+    : string
     {
         return str_repeat($separator, ($length < $number ? $number - $length : $number));
     }
@@ -155,7 +189,10 @@ class ResultsView
      * @param int|float $timeNSec
      * @return string
      */
-    private function getTimeToString(int|float $timeNSec): string
+    private function getTimeToString(
+        int|float $timeNSec
+    )
+    : string
     {
         $timeSec = $timeNSec/1000000;
         if (is_float($timeNSec)) {
@@ -171,7 +208,10 @@ class ResultsView
      * @param $number
      * @return float|int
      */
-    private function roundNumber($number): float|int
+    private function roundNumber(
+        $number
+    )
+    : float|int
     {
         if ($number >= 1000) {
             return round($number, 1);
