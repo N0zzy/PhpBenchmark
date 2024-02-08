@@ -12,13 +12,23 @@ use N0zzy\PhpBenchmark\PhpBenchmark;
 #[BenchmarkMemory( limit: 500 )]
 class BenchmarkTest
 {
+    #[Benchmark(count: 100)]
+    public function countArray1(): void
+    {
+        $a = count([1,2,3,4]);
+    }
+    #[Benchmark(count: 100)]
+    public function sizeofArray1(): void
+    {
+        $a = sizeof([1,2,3,4]);
+    }
     #[Benchmark(count: 100000)]
-    public function countArray(): void
+    public function countArray2(): void
     {
         $a = count([1,2,3,4]);
     }
     #[Benchmark(count: 100000)]
-    public function sizeofArray(): void
+    public function sizeofArray2(): void
     {
         $a = sizeof([1,2,3,4]);
     }
@@ -32,6 +42,8 @@ new PhpBenchmark(
 ```text
 |__Name________________________|__Memory(RSS, kb)________|__Count_____________|__Time(min, s/ns)___|__Time(max, s/ns)___|__Time(avg, s/ns)___|
 |  (c) BenchmarkTest           |  4                      |  1                 |                 0  |                 0  |                 0  |
-|  (m) countArray              |  1.515625               |  100000            |           0 / 100  |  0.0022 / 2193500  |        0 / 170.96  |
-|  (m) sizeofArray             |  1.515625               |  100000            |           0 / 100  |  0.0022 / 2181200  |        0 / 170.17  |
+|  (m) countArray1             |  0                      |  100               |           0 / 100  |          0 / 1900  |        0 / 247.00  |
+|  (m) sizeofArray1            |  0                      |  100               |           0 / 100  |           0 / 400  |        0 / 168.00  |
+|  (m) countArray2             |  1.515625               |  100000            |           0 / 100  |  0.0023 / 2257700  |        0 / 179.51  |
+|  (m) sizeofArray2            |  1.515625               |  100000            |           0 / 100  |  0.0023 / 2276600  |        0 / 175.96  |
 ```
