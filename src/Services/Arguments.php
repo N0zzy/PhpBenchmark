@@ -26,8 +26,8 @@ final class Arguments
     /**
      * @var bool
      */
-    #[BenchmarkDefault(value: false)]
-    public bool $memory = false;
+    #[BenchmarkDefault(value: true)]
+    public bool $memory = true;
 
     /**
      * @return void

@@ -12,6 +12,8 @@
 
 namespace N0zzy\PhpBenchmark\Services;
 
+use N0zzy\PhpBenchmark\PhpBenchmark;
+
 /**
  * Class ResultsView
  */
@@ -26,6 +28,11 @@ class ResultsView
      */
     public function render(): void
     {
+        $title = [];
+        $title[] = "PhpBenchmark";
+        $title[] = "Php version: " . phpversion();
+        echo implode("\n", $title) . "\n";
+
         $header = [];
         array_map(function ($arr) use (&$header) {
 
@@ -85,7 +92,7 @@ class ResultsView
                     [$buffer->results->countMethods[$key], 20],
                     [ $this->getTimeToString($tMin) ],
                     [ $this->getTimeToString($tMax) ],
-                    [ $this->getTimeToString($tAvg) ],
+                    [ $this->getTimeToString($tAvg, true) ],
                 ]);
                 $body[] = "\n";
             }
@@ -188,10 +195,12 @@ class ResultsView
 
     /**
      * @param int|float $timeNSec
+     * @param bool $zero
      * @return string
      */
     private function getTimeToString(
-        int|float $timeNSec
+        int|float $timeNSec,
+        bool $zero = false
     )
     : string
     {
@@ -201,6 +210,9 @@ class ResultsView
         }
         if (is_float($timeSec)) {
             $timeSec = $this->roundNumber($timeSec);
+        }
+        if($zero) {
+            $timeNSec = number_format($timeNSec, 2, '.', '');
         }
         return $timeSec. " / " . $timeNSec;
     }

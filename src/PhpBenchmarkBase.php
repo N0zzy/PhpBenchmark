@@ -249,21 +249,19 @@ abstract class PhpBenchmarkBase
                 $memory = memory_get_peak_usage() ;
             }
 
-            $start_time = hrtime(true);
+            $et=-hrtime(true);
             $method->invokeArgs($o, $mArgs);
-            $end_time = hrtime(true);
+            $et+=hrtime(true);
 
             if ($memory > -1) {
                 $memory = (memory_get_peak_usage() - $memory) / 1024;
                 memory_reset_peak_usage();
+
                 $this->buffer[$classFullName]->results->memoryMethods[$name] += $memory;
             }
 
-            $execution_time_ns = $end_time - $start_time;
-
             $this->buffer[$classFullName]->results->countMethods[$name]++;
-            $this->buffer[$classFullName]->results->timeMethods[$name][] = $execution_time_ns;
-
+            $this->buffer[$classFullName]->results->timeMethods[$name][] = $et;
         }
     }
 
