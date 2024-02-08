@@ -25,7 +25,6 @@ class BenchmarkTest
             $arr[] = $i;
         }
     }
-
     #[Benchmark(count: 100000)]
     public function foreach1(): void
     {
@@ -34,7 +33,6 @@ class BenchmarkTest
             $arr[] = $value;
         }
     }
-
     #[Benchmark(count: 100000)]
     public function foreach2(): void
     {
@@ -43,13 +41,11 @@ class BenchmarkTest
             $arr[] = $value;
         }
     }
-
     #[Benchmark(count: 100000)]
     public function arrayMap1(): void
     {
         $arr = array_map(fn($value)=>$value, [1,2,3]);
     }
-
     #[Benchmark(count: 100000)]
     public function arrayMap2(): void
     {
@@ -57,14 +53,12 @@ class BenchmarkTest
             return $value;
         }, [1,2,3]);
     }
-
     #[Benchmark(count: 100000)]
     public function arrayMap3(): void
     {
         global $value1;
         $arr = array_map($value1, [1,2,3]);
     }
-
     #[Benchmark(count: 100000)]
     public function arrayMap4(): void
     {

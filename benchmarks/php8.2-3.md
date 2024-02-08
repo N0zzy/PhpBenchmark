@@ -20,7 +20,6 @@ class BenchmarkTest
         };
         $a();
     }
-
     #[Benchmark(count: 1000)]
     public function function2(): void
     {

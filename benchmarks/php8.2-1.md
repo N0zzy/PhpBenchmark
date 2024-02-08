@@ -17,7 +17,6 @@ class BenchmarkTest
     {
         $a = count([1,2,3,4]);
     }
-
     #[Benchmark(count: 100000)]
     public function sizeofArray(): void
     {

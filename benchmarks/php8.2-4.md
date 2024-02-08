@@ -12,7 +12,6 @@ use N0zzy\PhpBenchmark\PhpBenchmark;
 #[BenchmarkMemory( limit: 500 )]
 class BenchmarkTest
 {
-    
     #[Benchmark(count: 100000)]
     public function tryCatch1(): bool
     {
@@ -40,7 +39,6 @@ class BenchmarkTest
         }
         return true;
     }
-
     #[Benchmark(count: 100000)]
     public function noTryCatch(): bool
     {
