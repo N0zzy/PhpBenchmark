@@ -162,6 +162,8 @@ abstract class PhpBenchmarkBase
                     );
                 }
             }
+            gc_collect_cycles();
+            gc_enable();
         }
     }
 

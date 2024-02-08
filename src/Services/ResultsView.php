@@ -31,6 +31,7 @@ class ResultsView
         $title = [];
         $title[] = "PhpBenchmark";
         $title[] = "Php version: " . phpversion();
+
         echo implode("\n", $title) . "\n";
 
         $header = [];
