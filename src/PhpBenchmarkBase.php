@@ -163,7 +163,7 @@ abstract class PhpBenchmarkBase
      */
     private function methodIterator
     (
-        object $o,
+        object &$o,
         \ReflectionMethod $method,
         $params,
         int $count,
@@ -179,18 +179,19 @@ abstract class PhpBenchmarkBase
 
         for ($i = 0; $i < $count; $i++){
             if($isGC) $this->gc();
-            memory_reset_peak_usage();
             $memory = -1;
+            memory_reset_peak_usage();
             if($isMemory){
+                memory_reset_peak_usage();
                 $memory = memory_get_peak_usage() ;
             }
-
             $et=-hrtime(true);
             $method->invokeArgs($o, $params);
             $et+=hrtime(true);
 
             if ($memory >= 0) {
                 $memory = (memory_get_peak_usage() - $memory) / 1024;
+                memory_reset_peak_usage();
                 $this->view->memory += $memory;
             }
             $this->view->times[] = $et;
@@ -198,7 +199,7 @@ abstract class PhpBenchmarkBase
         }
 
         $this->view->getMethod();
-        $this->view->clearTimes();
+        $this->view->clear();
     }
 
     /**

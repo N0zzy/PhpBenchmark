@@ -22,13 +22,10 @@ class BenchmarkTest
 
 
     #[Benchmark(count: 100)]
-    #[BenchmarkMethod(args: [
-        "arg1" => 1,
-        "arg2" => 1
-    ])]
-    public static function test1(int $arg1, int $arg2): void
+    public function test1(): void
     {
-        $a = str_repeat( $arg1, rand($arg2, 1000) );
+        $this->b = rand(1, 1000);
+        $this->a = str_repeat( 'a', $this->b );
     }
 
     #[Benchmark(count: 100)]
