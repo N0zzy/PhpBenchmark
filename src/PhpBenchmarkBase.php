@@ -221,7 +221,12 @@ abstract class PhpBenchmarkBase
      * @param bool $refMemory
      * @return bool
      */
-    private function getMethodMemoryToBool(\ReflectionMethod $method, bool $refMemory): bool
+    private function getMethodMemoryToBool
+    (
+        \ReflectionMethod $method,
+        bool $refMemory
+    )
+    : bool
     {
         $memory = $method->getAttributes(BenchmarkMemory::class);
         return ($memory[0] ?? false) && $memory[0]->newInstance() instanceof BenchmarkMemory || $refMemory;
@@ -231,13 +236,25 @@ abstract class PhpBenchmarkBase
      * @param \ReflectionMethod $method
      * @return bool
      */
-    private function getMethodGCToBool(\ReflectionMethod $method): bool
+    private function getMethodGCToBool
+    (
+        \ReflectionMethod $method
+    )
+    : bool
     {
         $cold = $method->getAttributes(BenchmarkGC::class);
         return ($cold[0] ?? false) && $cold[0]->newInstance() instanceof BenchmarkGC;
     }
 
-    private function getMethodParamsToArray(\ReflectionMethod $method)
+    /**
+     * @param \ReflectionMethod $method
+     * @return array
+     */
+    private function getMethodParamsToArray
+    (
+        \ReflectionMethod $method
+    )
+    : array
     {
         $params = $method->getAttributes(BenchmarkMethod::class);
         return ($params[0] ?? false) && ($arrParams = $params[0]->newInstance()) instanceof BenchmarkMethod
