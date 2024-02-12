@@ -237,9 +237,4 @@ class Views
         $this->times = [];
         $this->memory = 0;
     }
-
-    public function clearTimes(): void
-    {
-        $this->times = [];
-    }
 }
