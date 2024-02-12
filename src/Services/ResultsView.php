@@ -19,24 +19,249 @@ use N0zzy\PhpBenchmark\PhpBenchmark;
  */
 class ResultsView
 {
+    public string $name = "";
+    public array $times = [];
+    public int|float $memory = 0;
+
+
+//    /**
+//     * @var array|BufferClasses[] $buffer
+//     */
+//    private array $buffer = [];
+//    /**
+//     * @return void
+//     */
+//    public function render(): void
+//    {
+//        $title = [];
+//        $title[] = "PhpBenchmark";
+//        $title[] = "Php version: " . phpversion();
+//
+//        echo implode("\n", $title) . "\n";
+//
+//        $header = [];
+//        array_map(function ($arr) use (&$header) {
+//
+//            $header[] = count($header) < 1 || isset( $arr[1])
+//                ?  $this->addWhiteSpace($arr[0], true, $arr[1])
+//                : $this->addWhiteSpace($arr[0]);
+//        }, [
+//            ["Name", 30],
+//            ["Memory(RSS, kb)", 25],
+//            ["Count", 20],
+//            ["Time(min, s/ns)"],
+//            ["Time(max, s/ns)"],
+//            ["Time(avg, s/ns)"],
+//        ]);
+//
+//        $strHeader = "|". implode("|", $header) . "|";
+//        $lengthAll = strlen($strHeader);
+//
+//        $body = [];
+//
+//        /**
+//         * @var BufferClasses $buffer
+//         */
+//        foreach ($this->buffer as $buffer) {
+//            $body[] = "|";
+//            $arrClassName = explode("\\", $buffer->classFullName);
+//            $timeClass = $buffer->results->timeClass;
+//            $countTimeClass = count($timeClass);
+//            $tMin = $countTimeClass > 0 ? min($timeClass) : "NaN";
+//            $tMax = $countTimeClass > 0 ? max($timeClass) : "NaN";
+//            $tAvg = $countTimeClass > 0 ? array_sum($timeClass) / $countTimeClass : "NaN";
+//            array_map( function ($arr) use (&$body) {
+//                $body[] = isset($arr[1])
+//                    ? $this->addWhiteSpace($arr[0], false, $arr[1])
+//                    : $this->addWhiteSpaceEnd($arr[0], false);
+//                $body[] = "|";
+//            }, [
+//                ["(c) " . end($arrClassName), 30],
+//                [$buffer->results->memoryClass, 25],
+//                [$buffer->results->countClass, 20],
+//                [ $this->getTimeToString($tMin) ],
+//                [ $this->getTimeToString($tMax) ],
+//                [ $this->getTimeToString($tAvg, true) ],
+//            ]);
+//            $body[] = "\n";
+//
+//            foreach ($buffer->results->memoryMethods as $key => $value) {
+//                $body[] = "|";
+//                $arrMethod = $buffer->results->timeMethods[$key];
+//                $tMin = min($arrMethod);
+//                $tMax = max($arrMethod);
+//                $tAvg = array_sum($arrMethod) / count($arrMethod);
+//                array_map( function ($arr) use (&$body) {
+//                    $body[] = isset($arr[1])
+//                        ? $this->addWhiteSpace($arr[0], false, $arr[1])
+//                        : $this->addWhiteSpaceEnd($arr[0], false);
+//                    $body[] = "|";
+//                }, [
+//                    ["(m) " . $key, 30],
+//                    [$buffer->results->memoryMethods[$key], 25],
+//                    [$buffer->results->countMethods[$key], 20],
+//                    [ $this->getTimeToString($tMin) ],
+//                    [ $this->getTimeToString($tMax) ],
+//                    [ $this->getTimeToString($tAvg, true) ],
+//                ]);
+//                $body[] = "\n";
+//            }
+//        }
+//        echo "{$strHeader}\n" . implode("", $body);
+//    }
+//
+//    /**
+//     * @param array|BufferClasses[] $buffer
+//     * @return void
+//     */
+//    public function set
+//    (
+//        array $buffer
+//    )
+//    : void
+//    {
+//        $this->buffer = $buffer;
+//    }
+//
+//    /**
+//     * @param string|int|float $str
+//     * @param bool $add
+//     * @param int $number
+//     * @return string
+//     */
+//    private function addWhiteSpace(
+//        string|int|float $str,
+//        bool $add = true,
+//        int $number = 20
+//    )
+//    : string
+//    {
+//        $this->packDataForView( $str, $separator, $length, $add);
+//        if (strlen($str) > 26) {
+//            $str = substr($str, 0, 26) . "...";
+//        }
+//        return  $str . $this->getWhiteSpaceRepeat($separator, $length, $number);
+//    }
+//
+//    /**
+//     * @param string|int|float $str
+//     * @param bool $add
+//     * @param int $number
+//     * @return string
+//     */
+//    private function addWhiteSpaceEnd(
+//        string|int|float $str,
+//        bool $add = true,
+//        int $number = 20
+//    )
+//    : string
+//    {
+//        $this->packDataForView( $str, $separator, $length, $add, true);
+//        return  $this->getWhiteSpaceRepeat($separator, $length, $number) . $str;
+//    }
+//
+//    /**
+//     * @param $str
+//     * @param $separator
+//     * @param $length
+//     * @param bool $add
+//     * @param bool $reverse
+//     * @return void
+//     */
+//    private function packDataForView(
+//        &$str,
+//        &$separator,
+//        &$length,
+//        bool $add,
+//        bool $reverse = false
+//    )
+//    : void
+//    {
+//        $str = !$reverse ? "__" . (string)$str : (string)$str . "__";
+//
+//        $separator = "_";
+//        if(!$add) {
+//            $separator = " ";
+//            $str = str_replace("_", $separator, $str);
+//        }
+//        $length = strlen($str);
+//    }
+//
+//    /**
+//     * @param $separator
+//     * @param $length
+//     * @param $number
+//     * @return string
+//     */
+//    private function getWhiteSpaceRepeat(
+//        $separator,
+//        $length,
+//        $number
+//    )
+//    : string
+//    {
+//        return str_repeat($separator, ($length < $number ? $number - $length : $number));
+//    }
+//
     /**
-     * @var array|BufferClasses[] $buffer
+     * @param int|float $timeNSec
+     * @param bool $zero
+     * @return string
      */
-    private array $buffer = [];
+    private function getTimeToString(
+        int|float $timeNSec,
+        bool $zero = false
+    )
+    : string
+    {
+        $timeSec = $timeNSec/1000000000;
+        if (is_float($timeNSec)) {
+            $timeNSec = $this->roundNumber($timeNSec);
+        }
+        if (is_float($timeSec)) {
+            $timeSec = $this->roundNumber($timeSec);
+        }
+        if($zero && $timeNSec < 99) {
+            $timeNSec = number_format($timeNSec, 2, '.', '');
+        }
+        else {
+            $timeNSec = round($timeNSec, 0);
+        }
+        return $timeSec. " / " . $timeNSec;
+    }
+    /**
+     * @param int|float $number
+     * @return float|int
+     */
+    private function roundNumber(
+        int|float $number
+    )
+    : float|int
+    {
+        if ($number >= 1000) {
+            return round($number, 1);
+        } elseif ($number >= 100) {
+            return round($number, 2);
+        } elseif ($number >= 10) {
+            return round($number, 3);
+        }  else {
+            return round($number, 4);
+        }
+    }
+    public int $count = 0;
+
     /**
      * @return void
      */
-    public function render(): void
+    public function getHeaders(): void
     {
         $title = [];
         $title[] = "PhpBenchmark";
         $title[] = "Php version: " . phpversion();
-
         echo implode("\n", $title) . "\n";
 
         $header = [];
         array_map(function ($arr) use (&$header) {
-
             $header[] = count($header) < 1 || isset( $arr[1])
                 ?  $this->addWhiteSpace($arr[0], true, $arr[1])
                 : $this->addWhiteSpace($arr[0]);
@@ -49,69 +274,62 @@ class ResultsView
             ["Time(avg, s/ns)"],
         ]);
 
-        $strHeader = "|". implode("|", $header) . "|";
-        $lengthAll = strlen($strHeader);
-
-        $body = [];
-
-        /**
-         * @var BufferClasses $buffer
-         */
-        foreach ($this->buffer as $buffer) {
-            $body[] = "|";
-            $arrClassName = explode("\\", $buffer->classFullName);
-
-            array_map( function ($arr) use (&$body) {
-                $body[] = isset($arr[1])
-                    ? $this->addWhiteSpace($arr[0], false, $arr[1])
-                    : $this->addWhiteSpaceEnd($arr[0], false);
-                $body[] = "|";
-            }, [
-                ["(c) " . end($arrClassName), 30],
-                [$buffer->results->memoryClass, 25],
-                [$buffer->results->countClass, 20],
-                [0],
-                [0],
-                [0],
-            ]);
-            $body[] = "\n";
-
-            foreach ($buffer->results->memoryMethods as $key => $value) {
-                $body[] = "|";
-                $arrMethod = $buffer->results->timeMethods[$key];
-                $tMin = min($arrMethod);
-                $tMax = max($arrMethod);
-                $tAvg = array_sum($arrMethod) / count($arrMethod);
-                array_map( function ($arr) use (&$body) {
-                    $body[] = isset($arr[1])
-                        ? $this->addWhiteSpace($arr[0], false, $arr[1])
-                        : $this->addWhiteSpaceEnd($arr[0], false);
-                    $body[] = "|";
-                }, [
-                    ["(m) " . $key, 30],
-                    [$buffer->results->memoryMethods[$key], 25],
-                    [$buffer->results->countMethods[$key], 20],
-                    [ $this->getTimeToString($tMin) ],
-                    [ $this->getTimeToString($tMax) ],
-                    [ $this->getTimeToString($tAvg, true) ],
-                ]);
-                $body[] = "\n";
-            }
-        }
-        echo "{$strHeader}\n" . implode("", $body);
+        echo "|" . implode("|", $header) . "|\n";
     }
 
     /**
-     * @param array|BufferClasses[] $buffer
+     * @param int $value
      * @return void
      */
-    public function set
-    (
-        array $buffer
-    )
-    : void
+    public function getMemory(int $value): void
     {
-        $this->buffer = $buffer;
+        echo "|  Php Memory Limit: " . $value . "M\n";
+    }
+
+    public function getObject(): void
+    {
+        $body = [];
+        $tMin = sizeof($this->times) > 0 ? min($this->times) : "NaN";
+        $tMax = sizeof($this->times) > 0 ? max($this->times) : "NaN";
+        $tAvg = array_sum($this->times) / count($this->times);
+        array_map( function ($arr) use (&$body) {
+            $body[] = isset($arr[1])
+                ? $this->addWhiteSpace($arr[0], false, $arr[1])
+                : $this->addWhiteSpaceEnd($arr[0], false);
+            $body[] = "|";
+        }, [
+            [ "(c) " . $this->name, 30 ],
+            [ $this->memory, 25 ],
+            [ $this->count, 20 ],
+            [ $this->getTimeToString($tMin) ],
+            [ $this->getTimeToString($tMax) ],
+            [ $this->getTimeToString($tAvg, true) ],
+        ]);
+        echo "|". implode("", $body) . "\n";
+    }
+
+    public function getMethod(): void
+    {
+        $body = [];
+        $tMin = sizeof($this->times) > 0 ? min($this->times) : "NaN";
+        $tMax = sizeof($this->times) > 0 ? max($this->times) : "NaN";
+        $tAvg = array_sum($this->times) / count($this->times);
+        array_map( function ($arr) use (&$body) {
+            $body[] = isset($arr[1])
+                ? $this->addWhiteSpace($arr[0], false, $arr[1])
+                : $this->addWhiteSpaceEnd($arr[0], false);
+            $body[] = "|";
+        }, [
+            [ "(m) " . $this->name, 30 ],
+            [ $this->memory, 25 ],
+            [ $this->count, 20 ],
+            [ $this->getTimeToString($tMin) ],
+            [ $this->getTimeToString($tMax) ],
+            [ $this->getTimeToString($tAvg, true) ],
+        ]);
+        $body[] = "\n";
+        echo "|" . implode("", $body);
+
     }
 
     /**
@@ -128,11 +346,13 @@ class ResultsView
     : string
     {
         $this->packDataForView( $str, $separator, $length, $add);
-        if (strlen($str) > 20) {
-            $str = substr($str, 0, 20) . "...";
+        if (strlen($str) > 26) {
+            $str = substr($str, 0, 26) . "...";
         }
         return  $str . $this->getWhiteSpaceRepeat($separator, $length, $number);
     }
+
+
 
     /**
      * @param string|int|float $str
@@ -152,13 +372,13 @@ class ResultsView
     }
 
     /**
-     * @param $str
-     * @param $separator
-     * @param $length
-     * @param bool $add
-     * @param bool $reverse
-     * @return void
-     */
+         * @param $str
+         * @param $separator
+         * @param $length
+         * @param bool $add
+         * @param bool $reverse
+         * @return void
+         */
     private function packDataForView(
         &$str,
         &$separator,
@@ -194,47 +414,14 @@ class ResultsView
         return str_repeat($separator, ($length < $number ? $number - $length : $number));
     }
 
-    /**
-     * @param int|float $timeNSec
-     * @param bool $zero
-     * @return string
-     */
-    private function getTimeToString(
-        int|float $timeNSec,
-        bool $zero = false
-    )
-    : string
+    public function clear(): void
     {
-        $timeSec = $timeNSec/1000000000;
-        if (is_float($timeNSec)) {
-            $timeNSec = $this->roundNumber($timeNSec);
-        }
-        if (is_float($timeSec)) {
-            $timeSec = $this->roundNumber($timeSec);
-        }
-        if($zero) {
-            $timeNSec = number_format($timeNSec, 2, '.', '');
-        }
-        return $timeSec. " / " . $timeNSec;
+        $this->times = [];
+        $this->memory = 0;
     }
 
-    /**
-     * @param int|float $number
-     * @return float|int
-     */
-    private function roundNumber(
-        int|float $number
-    )
-    : float|int
+    public function clearTimes(): void
     {
-        if ($number >= 1000) {
-            return round($number, 1);
-        } elseif ($number >= 100) {
-            return round($number, 2);
-        } elseif ($number >= 10) {
-            return round($number, 3);
-        }  else {
-            return round($number, 4);
-        }
+        $this->times = [];
     }
 }

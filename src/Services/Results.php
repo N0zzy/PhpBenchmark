@@ -31,6 +31,10 @@ final class Results
     /**
      * @var array
      */
+    public array $timeClass = [];
+    /**
+     * @var array
+     */
     public array $memoryMethodsView = [];
     /**
      * @var array

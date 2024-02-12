@@ -12,14 +12,11 @@
 
 namespace N0zzy\PhpBenchmark;
 
-use ReflectionAttribute;
+use N0zzy\PhpBenchmark\Attributes\BenchmarkGC;
 use N0zzy\PhpBenchmark\Attributes\Benchmark;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMemory;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
-use N0zzy\PhpBenchmark\Services\Arguments;
-use N0zzy\PhpBenchmark\Services\BufferArguments;
 use N0zzy\PhpBenchmark\Services\BufferClasses;
-use N0zzy\PhpBenchmark\Services\BufferMethods;
 use N0zzy\PhpBenchmark\Services\ResultsView;
 
 /**
@@ -31,10 +28,9 @@ abstract class PhpBenchmarkBase
      * @var array|string[]
      */
     protected array $subjects = [];
-    /**
-     * @var array|BufferClasses[]
-     */
-    protected array $buffer = [];
+
+    protected int $memoryLimit = 0;
+
     /**
      * @var ResultsView|null
      */
@@ -43,25 +39,23 @@ abstract class PhpBenchmarkBase
     /**
      * @throws \ReflectionException
      */
-    protected function __construct()
+    public function __construct()
     {
         $this->view = new ResultsView();
         $this->run();
-        $this->view->set($this->buffer);
-        $this->view->render();
     }
 
     /**
+     * @return void
      * @throws \ReflectionException
      */
     private function run(): void
     {
-        foreach ($this->subjects as $subject) {
+        $this->view->getHeaders();
+        foreach ($this->subjects as &$subject){
             if (!class_exists($subject)) continue;
             $this->classIterator($subject);
         }
-
-        $this->execute();
     }
 
     /**
@@ -77,203 +71,177 @@ abstract class PhpBenchmarkBase
     {
         $refClass = new \ReflectionClass($subject);
         if ($refClass->getName() == Benchmark::class) return;
-
+        /**
+         * @var Benchmark $refBenchmark
+         */
+        $refBenchmark = $refClass->getAttributes(Benchmark::class)[0]->newInstance();
+        $refMemory = $refClass->getAttributes(BenchmarkMemory::class);
+        $refMemory =
+            ($refMemory[0] ?? false) &&
+            $refMemory[0]->newInstance() instanceof BenchmarkMemory
+        ;
+        $refMemoryLimit = $refClass->getAttributes(BenchmarkMemory::class);
+        $refMemoryLimit = ($refMemoryLimit[0] ?? false) ? $refMemoryLimit[0]->newInstance()->limit : 0;
+        if($refMemoryLimit > 0 && $this->memoryLimit < $refMemoryLimit){
+            $this->memoryLimit = $refMemoryLimit;
+            ini_set("memory_limit","{$this->memoryLimit}M");
+            $this->view->getMemory($refMemoryLimit);
+        }
         $classFullName = $refClass->getNamespaceName() . '\\' . $refClass->getName();
-        if (!isset($this->buffer[$classFullName])) {
-            $buffer = new BufferClasses($classFullName);
-            $this->setArguments(
-                $buffer,
-                $refClass->getAttributes(Benchmark::class)[0]->getArguments()
-            );
-            $refMethods = $refClass->getMethods();
-            foreach ($refMethods as $method) {
-                $this->setMethod($buffer, $method);
-            }
-            $this->buffer[$classFullName] = $buffer;
-        }
-
-        $benchmarkMemory = $refClass->getAttributes(BenchmarkMemory::class);
-        if(count($benchmarkMemory) == 1){
-            ini_set("memory_limit", ($benchmarkMemory[0]->getArguments()['limit'] * 1024 * 1024) . 'M');
-        }
-    }
-
-
-    /**
-     * @param BufferArguments $buffer
-     * @param array $args
-     * @return void
-     */
-    private function setArguments(
-        BufferArguments &$buffer,
-        array $args
-    )
-    : void
-    {
-        foreach ($args as $key => $value) {
-            if (!property_exists($buffer->arguments, $key)) continue;
-            $buffer->arguments->{$key} = $value;
-        }
-    }
-
-    private function setMethod
-    (
-        BufferClasses &$buffer,
-        \ReflectionMethod $method
-    )
-    : void
-    {
-        $methodName = $method->getName();
-        if (!isset($buffer->methods[$methodName])) {
-            $bufferMethod = new BufferMethods;
-            $bufferMethod->method = $method;
-            $this->attributesIterator($method, $bufferMethod);
-            $buffer->methods[$methodName] = $bufferMethod;
-        }
-    }
-
-    /**
-     * @throws \ReflectionException
-     */
-    private function execute(): void
-    {
+        $refMethods = $refClass->getMethods();
         /**
-         * @var BufferClasses $object
+         * @var Benchmark $oMemory
          */
-        foreach ($this->buffer as $key => $item) {
-            for ($i = 0; $i < $item->arguments->count; $i++) {
-                $o = $this->runObject($item->classFullName, $item->arguments);
-                $this->buffer[$item->classFullName]->results->countClass++;
-                /**
-                 * @var BufferMethods $method
-                 */
-                foreach ($item->methods as $method) {
-                    $methodName = $method->method->getName();
-                    if (!array_key_exists($methodName, $item->results->countMethods)) {
-                        $item->results->countMethods[$methodName] = 0;
-                        $item->results->memoryMethods[$methodName] = 0;
-                    }
-                    $this->runMethod(
-                        $item->classFullName,
-                        $o,
-                        $method->method,
-                        $method->arguments,
-                        $method->methodArguments
-                    );
-                }
+        $this->objectIterator($classFullName, $refBenchmark->count, $o);
+        foreach ($refMethods as &$method){
+            /**
+             * @var Benchmark $benchmark
+             */
+            $benchmark = $method->getAttributes(Benchmark::class)[0]->newInstance();
+            if($benchmark instanceof Benchmark){
+                $memory = $this->getMethodMemoryToBool($method, $refMemory);
+                $gc = $this->getMethodGCToBool($method);
+                $params  = $this->getMethodParamsToArray($method);
+                $this->methodIterator($o, $method, $params, $benchmark->count, $memory, $gc);
             }
-            gc_collect_cycles();
-            gc_enable();
-        }
-    }
-
-    private function attributesIterator(
-        $method,
-        &$bufferMethod
-    )
-    : void
-    {
-        /**
-         * @var ReflectionAttribute $attr
-         */
-        foreach ($method->getAttributes() as $attr) {
-            $o = $attr->newInstance();
-
-            if( $o instanceof Benchmark ) {
-                $this->setArguments(
-                    $bufferMethod,
-                    $method->getAttributes(Benchmark::class)[0]->getArguments()
-                );
-            }
-            else
-            if( $o instanceof BenchmarkMethod ) {
-                $this->setMethodArguments(
-                    $bufferMethod,
-                    $attr->getArguments()['args']
-                );
-            }
+            $this->view->clear();
         }
     }
 
     /**
      * @param string $classFullName
-     * @param Arguments $args
-     * @return object
+     * @param int $count
+     * @param object|null $o
+     * @param bool $isMemory
+     * @param bool $isGc
+     * @return void
      */
-    private function runObject
+    private function objectIterator
     (
         string $classFullName,
-        Arguments $args
-    )
-    : object
-    {
-        $memory = -1;
-        if ($args->memory) {
-            $memory = getrusage()["ru_maxrss"];
-        }
-
-        $object = new $classFullName();
-
-        if ($memory > -1) {
-            $memory = getrusage()["ru_maxrss"] - $memory;
-            $this->buffer[$classFullName]->results->memoryClass += $memory;
-        }
-        return $object;
-    }
-
-
-    /**
-     * @param string $classFullName
-     * @param object $o
-     * @param \ReflectionMethod $method
-     * @param Arguments $args
-     * @param array $mArgs
-     * @return void
-     * @throws \ReflectionException
-     */
-    private function runMethod
-    (
-        string            $classFullName,
-        object            $o,
-        \ReflectionMethod $method,
-        Arguments         $args,
-        array             $mArgs
+        int $count,
+        ?object &$o,
+        bool $isMemory = true,
+        bool $isGc = true
     )
     : void
     {
-
-        for ($i = 0; $i < $args->count; $i++) {
+        $this->gc();
+        $name = explode("\\", $classFullName);
+        $this->view->name = end($name);
+        $this->view->count = $count;
+        for ($i=0; $i < $count; $i++){
+            if($isGc) $this->gc();
+            memory_reset_peak_usage();
             $memory = -1;
-            $name = $method->getName();
+            if($isMemory){
+                $memory = memory_get_peak_usage() ;
+            }
+            $et=-hrtime(true);
+            $o = new $classFullName();
+            $et+=hrtime(true);
 
-            if ($args->memory) {
-                memory_reset_peak_usage();
+            memory_reset_peak_usage();
+            if ($memory >= 0) {
+                $memory = (memory_get_peak_usage() - $memory) / 1024;
+                $this->view->memory += $memory;
+            }
+            $this->view->times[] = $et;
+        }
+        $this->view->getObject();
+        $this->view->clear();
+    }
+
+    /**
+     * @param object $o
+     * @param \ReflectionMethod $method
+     * @param $params
+     * @param int $count
+     * @param bool $isMemory
+     * @param bool $isGC
+     * @return void
+     * @throws \ReflectionException
+     */
+    private function methodIterator
+    (
+        object $o,
+        \ReflectionMethod $method,
+        $params,
+        int $count,
+        bool $isMemory = true,
+        bool $isGC = false
+    )
+    : void
+    {
+        $this->view->count = $count;
+        $this->view->name = $method->getName();
+
+        $this->gc();
+
+        for ($i = 0; $i < $count; $i++){
+            if($isGC) $this->gc();
+            memory_reset_peak_usage();
+            $memory = -1;
+            if($isMemory){
                 $memory = memory_get_peak_usage() ;
             }
 
             $et=-hrtime(true);
-            $method->invokeArgs($o, $mArgs);
+            $method->invokeArgs($o, $params);
             $et+=hrtime(true);
 
-            if ($memory > -1) {
+            if ($memory >= 0) {
                 $memory = (memory_get_peak_usage() - $memory) / 1024;
-                memory_reset_peak_usage();
-
-                $this->buffer[$classFullName]->results->memoryMethods[$name] += $memory;
+                $this->view->memory += $memory;
             }
-
-            $this->buffer[$classFullName]->results->countMethods[$name]++;
-            $this->buffer[$classFullName]->results->timeMethods[$name][] = $et;
+            $this->view->times[] = $et;
+            memory_reset_peak_usage();
         }
+
+        $this->view->getMethod();
+        $this->view->clearTimes();
     }
 
     /**
-     * @param BufferMethods $buffer
-     * @param array $arguments
+     * @param int $ms
      * @return void
      */
-    private function setMethodArguments(BufferMethods &$buffer, array $arguments): void
+    private function gc
+    (
+        int $ms = 10
+    )
+    : void
     {
-        $buffer->methodArguments = $arguments;
+        gc_collect_cycles();
+        gc_enable();
+        usleep($ms);
+    }
+
+    /**
+     * @param \ReflectionMethod $method
+     * @param bool $refMemory
+     * @return bool
+     */
+    private function getMethodMemoryToBool(\ReflectionMethod $method, bool $refMemory): bool
+    {
+        $memory = $method->getAttributes(BenchmarkMemory::class);
+        return ($memory[0] ?? false) && $memory[0]->newInstance() instanceof BenchmarkMemory || $refMemory;
+    }
+
+    /**
+     * @param \ReflectionMethod $method
+     * @return bool
+     */
+    private function getMethodGCToBool(\ReflectionMethod $method): bool
+    {
+        $cold = $method->getAttributes(BenchmarkGC::class);
+        return ($cold[0] ?? false) && $cold[0]->newInstance() instanceof BenchmarkGC;
+    }
+
+    private function getMethodParamsToArray(\ReflectionMethod $method)
+    {
+        $params = $method->getAttributes(BenchmarkMethod::class);
+        return ($params[0] ?? false) && ($arrParams = $params[0]->newInstance()) instanceof BenchmarkMethod
+            ?  $arrParams->args : [];
     }
 }

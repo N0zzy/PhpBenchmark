@@ -20,12 +20,10 @@ final class Benchmark
 {
     /**
      * @param int $count
-     * @param bool $memory
      */
     public function __construct
     (
-        public int $count = 10,
-        public bool $memory = true
+        public int $count = 5,
     )
     {}
 }
