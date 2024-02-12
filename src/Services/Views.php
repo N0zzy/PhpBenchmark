@@ -15,7 +15,7 @@ namespace N0zzy\PhpBenchmark\Services;
 /**
  * Class ResultsView
  */
-class ResultsView
+class Views
 {
     public string $name = "";
     public array $times = [];

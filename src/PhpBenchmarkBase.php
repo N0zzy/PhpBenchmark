@@ -16,7 +16,7 @@ use N0zzy\PhpBenchmark\Attributes\BenchmarkGC;
 use N0zzy\PhpBenchmark\Attributes\Benchmark;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMemory;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
-use N0zzy\PhpBenchmark\Services\ResultsView;
+use N0zzy\PhpBenchmark\Services\Views;
 
 /**
  * Class PhpBenchmarkBase
@@ -31,16 +31,16 @@ abstract class PhpBenchmarkBase
     protected int $memoryLimit = 0;
 
     /**
-     * @var ResultsView|null
+     * @var Views|null
      */
-    protected ?ResultsView $view = null;
+    protected ?Views $view = null;
 
     /**
      * @throws \ReflectionException
      */
     public function __construct()
     {
-        $this->view = new ResultsView();
+        $this->view = new Views();
         $this->run();
     }
 
