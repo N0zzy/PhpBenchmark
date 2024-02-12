@@ -16,7 +16,6 @@ use N0zzy\PhpBenchmark\Attributes\BenchmarkGC;
 use N0zzy\PhpBenchmark\Attributes\Benchmark;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMemory;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
-use N0zzy\PhpBenchmark\Services\BufferClasses;
 use N0zzy\PhpBenchmark\Services\ResultsView;
 
 /**
