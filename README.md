@@ -23,12 +23,12 @@ class BenchmarkTest
 
     #[Benchmark(count: 100)]
     #[BenchmarkMethod(args: [
-        "test" => 1,
-        "test2" => 1
+        "arg1" => 1,
+        "arg2" => 1
     ])]
-    public static function test1(int $test, int $test2): void
+    public static function test1(int $arg1, int $arg2): void
     {
-        $a = str_repeat( $test, rand($test2, 1000) );
+        $a = str_repeat( $arg1, rand($arg2, 1000) );
     }
 
     #[Benchmark(count: 100)]
@@ -56,8 +56,9 @@ php your_php_script_benchmark
 
 ### Results
 ```text
-|__Name________________________|__Memory(kb)_____________|__Count_____________|__Time(min, s/ns)___|__Time(max, s/ns)___|__Time(avg, s/ns)___|
-|  (c) BenchmarkTest           |  0                      |  10                |                 0  |                 0  |                 0  |
-|  (m) test1                   |  0                      |  1000              |           0 / 200  |  0.0023 / 2255000  |        0 / 2590.3  |
-|  (m) test2                   |  0                      |  1000              |           0 / 200  |  0.0023 / 2336200  |        0 / 2612.4  |
+|__Name________________________|__Memory(RSS, kb)________|__Count_____________|__Time(min, s/ns)___|__Time(max, s/ns)___|__Time(avg, s/ns)___|
+|  Php Memory Limit: 500M
+|  (c) BenchmarkTest           |  0.078125               |  10                |          0 / 5100  |          0 / 9100  |          0 / 6770  |
+|  (m) test1                   |  55.9296875             |  100               |           0 / 400  | 0.0215 / 21490200  |   0.0002 / 215557  |
+|  (m) test2                   |  56.3828125             |  100               |           0 / 300  |         0 / 14500  |           0 / 662  |
 ```
