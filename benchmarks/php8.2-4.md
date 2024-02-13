@@ -12,7 +12,7 @@ use N0zzy\PhpBenchmark\PhpBenchmark;
 #[BenchmarkMemory( limit: 500 )]
 class BenchmarkTest
 {
-    #[Benchmark(count: 100000)]
+    #[Benchmark(count: 1000)]
     public function tryCatch1(): bool
     {
         foreach ([1,2,3] as $value) {
@@ -25,7 +25,7 @@ class BenchmarkTest
         }
         return true;
     }
-    #[Benchmark(count: 100000)]
+    #[Benchmark(count: 1000)]
     public function tryCatch2(): bool
     {
         $e = new Exception();
@@ -39,7 +39,7 @@ class BenchmarkTest
         }
         return true;
     }
-    #[Benchmark(count: 100000)]
+    #[Benchmark(count: 1000)]
     public function noTryCatch(): bool
     {
         foreach ([1,2,3] as $value) {
@@ -58,8 +58,9 @@ new PhpBenchmark(
 ### Results
 ```text
 |__Name________________________|__Memory(RSS, kb)________|__Count_____________|__Time(min, s/ns)___|__Time(max, s/ns)___|__Time(avg, s/ns)___|
-|  (c) BenchmarkTest           |  4                      |  1                 |                 0  |                 0  |                 0  |
-|  (m) tryCatch1               |  330469.1796875         |  100000            |           0 / 900  |  0.0023 / 2309300  |       0 / 1105.30  |
-|  (m) tryCatch2               |  330546.3984375         |  100000            |           0 / 900  |  0.0043 / 4336200  |       0 / 1435.10  |
-|  (m) noTryCatch              |  196.8125               |  100000            |           0 / 100  |  0.0022 / 2246400  |        0 / 226.71  |
+|  Php Memory Limit: 500M
+|  (c) BenchmarkTest           |  0.0390625              |  10                |           0 / 900  |          0 / 7000  |          0 / 3130  |
+|  (m) tryCatch1               |  3305.1171875           |  1000              |          0 / 1000  |  0.0024 / 2386200  |          0 / 8022  |
+|  (m) tryCatch2               |  3312.0078125           |  1000              |          0 / 1000  |  0.0023 / 2292200  |         0 / 21424  |
+|  (m) noTryCatch              |  4.8125                 |  1000              |           0 / 100  |  0.0023 / 2253600  |          0 / 6744  |
 ```

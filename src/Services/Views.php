@@ -26,7 +26,8 @@ class Views
      * @param bool $zero
      * @return string
      */
-    private function getTimeToString(
+    private function getTimeToString
+    (
         int|float $timeNSec,
         bool $zero = false
     )
@@ -51,7 +52,8 @@ class Views
      * @param int|float $number
      * @return float|int
      */
-    private function roundNumber(
+    private function roundNumber
+    (
         int|float $number
     )
     : float|int
@@ -99,7 +101,11 @@ class Views
      * @param int $value
      * @return void
      */
-    public function getMemory(int $value): void
+    public function getMemory
+    (
+        int $value
+    )
+    : void
     {
         echo "|  Php Memory Limit: " . $value . "M\n";
     }
@@ -156,7 +162,8 @@ class Views
      * @param int $number
      * @return string
      */
-    private function addWhiteSpace(
+    private function addWhiteSpace
+    (
         string|int|float $str,
         bool $add = true,
         int $number = 20
@@ -178,7 +185,8 @@ class Views
      * @param int $number
      * @return string
      */
-    private function addWhiteSpaceEnd(
+    private function addWhiteSpaceEnd
+    (
         string|int|float $str,
         bool $add = true,
         int $number = 20
@@ -197,7 +205,8 @@ class Views
          * @param bool $reverse
          * @return void
          */
-    private function packDataForView(
+    private function packDataForView
+    (
         &$str,
         &$separator,
         &$length,
@@ -222,7 +231,8 @@ class Views
      * @param $number
      * @return string
      */
-    private function getWhiteSpaceRepeat(
+    private function getWhiteSpaceRepeat
+    (
         $separator,
         $length,
         $number
