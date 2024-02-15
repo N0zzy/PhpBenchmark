@@ -76,7 +76,7 @@ class Views
      */
     public function getHeaders(): void
     {
-        $title = [""];
+        $title = [];
         $title[] = "PhpBenchmark";
         $title[] = "Php version: " . phpversion();
         echo implode("\n", $title) . "\t";
@@ -255,5 +255,13 @@ class Views
             $this->name = "";
             $this->isOutput = false;
         }
+    }
+
+    public function startPre(): void {
+        echo "<pre>";
+    }
+
+    public function endPre(): void {
+        echo "</pre>";
     }
 }

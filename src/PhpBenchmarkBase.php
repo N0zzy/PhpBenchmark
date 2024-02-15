@@ -16,6 +16,7 @@ use N0zzy\PhpBenchmark\Attributes\BenchmarkGC;
 use N0zzy\PhpBenchmark\Attributes\Benchmark;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMemory;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
+use N0zzy\PhpBenchmark\Services\OutputEnum;
 use N0zzy\PhpBenchmark\Services\Views;
 
 /**
@@ -27,8 +28,14 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
      * @var array|string[]
      */
     protected array $subjects = [];
-
+    /**
+     * @var int
+     */
     protected int $memoryLimit = 0;
+    /**
+     * @var PhpBenchmarkSettings|null
+     */
+    protected ?PhpBenchmarkSettings $settings = null;
 
     /**
      * @var Views|null
@@ -40,19 +47,42 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
      */
     public function __construct()
     {
-        if(sizeof($this->subjects) < 1) {
+        $size = sizeof($this->subjects);
+        if($size == 1) {
+            $this->addSettings();
+            $this->subjects = $this->findSubjects();
+        }
+        else if($size < 1) {
             $this->subjects = $this->findSubjects();
         }
         $this->view = new Views();
         $this->gc(100);
-        $this->run();
+        $this->output();
+        $this->execute();
+        $this->output(false);
     }
+
+    private function addSettings(): void
+    {
+        try {
+            $refSetting = new \ReflectionClass($this->subjects[0]);
+            $refAttributes = $refSetting->getAttributes(PhpBenchmarkSettings::class);
+            if ($refAttributes[0] ?? false) {
+                $this->settings = new PhpBenchmarkSettings( $refAttributes[0]->newInstance()->settings );
+                $this->settings->install();
+            }
+            unset($this->subjects[0]);
+        } catch (\ReflectionException $e) {
+
+        }
+    }
+
 
     /**
      * @return void
      * @throws \ReflectionException
      */
-    private function run(): void
+    private function execute(): void
     {
         $this->view->getHeaders();
         foreach ($this->subjects as &$subject){
@@ -88,7 +118,9 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
             $refMemory = $refClass->getAttributes(BenchmarkMemory::class);
             $refMemory = ($refMemory[0] ?? false) && $refMemory[0]->newInstance() instanceof BenchmarkMemory;
             $refMemoryLimit = $refClass->getAttributes(BenchmarkMemory::class);
-            $refMemoryLimit = ($refMemoryLimit[0] ?? false) ? $refMemoryLimit[0]->newInstance()->limit : 0;
+            $refMemoryLimit = ($refMemoryLimit[0] ?? false)
+                ? $refMemoryLimit[0]->newInstance()->limit
+                : $this->settings->memory ?? 0;
             if($refMemoryLimit > 0 && $this->memoryLimit < $refMemoryLimit){
                 $this->memoryLimit = $refMemoryLimit;
                 ini_set("memory_limit","{$this->memoryLimit}M");
@@ -115,7 +147,7 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
             if($benchmark instanceof Benchmark){
                 $this->view->getObject();
                 $memory = $this->getMethodMemoryToBool($method, $refMemory);
-                $gc = $this->getMethodGCToBool($method);
+                $gc = $this->settings->gc ?? $this->getMethodGCToBool($method);
                 $params  = $this->getMethodParamsToArray($method);
                 $this->methodIterator($o, $method, $params, $benchmark->count, $memory, $gc);
             }
@@ -149,7 +181,7 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
         $this->view->name = end($name);
         $this->view->count = $count;
         for ($i=0; $i < $count; $i++){
-            if($isGc) $this->gc();
+            if(($this->settings->gc ?? false) || $isGc) $this->gc();
             memory_reset_peak_usage();
             $memory = -1;
             if($isMemory){
@@ -198,7 +230,7 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
         $this->gc();
 
         for ($i = 0; $i < $count; $i++){
-            if($isGC) $this->gc();
+            if(($this->settings->gc ?? false) || $isGC) $this->gc();
             $memory = -1;
             memory_reset_peak_usage();
             if($isMemory){
@@ -292,5 +324,20 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
             $reflectionClass = new \ReflectionClass($class);
             return !$reflectionClass->isInternal();
         });
+    }
+
+    /**
+     * @param bool $start
+     * @return void
+     */
+    private function output(bool $start = true): void
+    {
+        if(($this->settings->output ?? false) == OutputEnum::Html) {
+            if($start) {
+                $this->view->startPre();
+            } else {
+                $this->view->endPre();
+            }
+        }
     }
 }

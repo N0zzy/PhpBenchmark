@@ -17,6 +17,8 @@ use N0zzy\PhpBenchmark\Attributes\BenchmarkDefault;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkGC;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMemory;
 use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
+use N0zzy\PhpBenchmark\Services\MemoryEnum;
+use N0zzy\PhpBenchmark\Services\OutputEnum;
 
 /**
  * Class PhpBenchmarkIgnore
@@ -27,6 +29,7 @@ abstract class PhpBenchmarkIgnore
      * @var array|string[]
      */
     protected array $listIgnore = [
+        PhpBenchmarkIgnore::class,
         BenchmarkDefault::class,
         BenchmarkGC::class,
         BenchmarkMemory::class,
@@ -34,6 +37,9 @@ abstract class PhpBenchmarkIgnore
         PhpBenchmarkIgnore::class,
         PhpBenchmarkBase::class,
         PhpBenchmark::class,
-        ClassLoader::class
+        ClassLoader::class,
+        PhpBenchmarkSettings::class,
+        MemoryEnum::class,
+        OutputEnum::class,
     ];
 }
