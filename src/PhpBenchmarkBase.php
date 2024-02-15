@@ -175,7 +175,6 @@ abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
     )
     : void
     {
-
         $this->gc();
         $name = explode("\\", $classFullName);
         $this->view->name = end($name);

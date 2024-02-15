@@ -10,11 +10,9 @@
  * @since 0.2
  */
 namespace N0zzy\PhpBenchmark\Attributes;
-#[\Attribute]
-class BenchmarkGC
-{
-    public function __construct()
-    {
 
-    }
+#[\Attribute]
+final class BenchmarkGC
+{
+    public function __construct(){}
 }
