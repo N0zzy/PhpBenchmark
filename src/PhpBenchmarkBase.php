@@ -21,7 +21,7 @@ use N0zzy\PhpBenchmark\Services\Views;
 /**
  * Class PhpBenchmarkBase
  */
-abstract class PhpBenchmarkBase
+abstract class PhpBenchmarkBase extends PhpBenchmarkIgnore
 {
     /**
      * @var array|string[]
@@ -40,7 +40,11 @@ abstract class PhpBenchmarkBase
      */
     public function __construct()
     {
+        if(sizeof($this->subjects) < 1) {
+            $this->subjects = $this->findSubjects();
+        }
         $this->view = new Views();
+        $this->gc(100);
         $this->run();
     }
 
@@ -69,35 +73,47 @@ abstract class PhpBenchmarkBase
     : void
     {
         $refClass = new \ReflectionClass($subject);
-        if ($refClass->getName() == Benchmark::class) return;
+        if (
+            $refClass->isInterface() ||
+            $refClass->isAbstract()
+        ) return;
         /**
          * @var Benchmark $refBenchmark
          */
-        $refBenchmark = $refClass->getAttributes(Benchmark::class)[0]->newInstance();
-        $refMemory = $refClass->getAttributes(BenchmarkMemory::class);
-        $refMemory =
-            ($refMemory[0] ?? false) &&
-            $refMemory[0]->newInstance() instanceof BenchmarkMemory
-        ;
-        $refMemoryLimit = $refClass->getAttributes(BenchmarkMemory::class);
-        $refMemoryLimit = ($refMemoryLimit[0] ?? false) ? $refMemoryLimit[0]->newInstance()->limit : 0;
-        if($refMemoryLimit > 0 && $this->memoryLimit < $refMemoryLimit){
-            $this->memoryLimit = $refMemoryLimit;
-            ini_set("memory_limit","{$this->memoryLimit}M");
-            $this->view->getMemory($refMemoryLimit);
+        $refBenchmark = $refClass->getAttributes(Benchmark::class);
+        $refBenchmark = ($refBenchmark[0] ?? false) ? $refBenchmark[0]->newInstance() : false;
+        $this->view->name = $refClass->getName();
+        if($refBenchmark instanceof Benchmark){
+            $classFullName = $refClass->getNamespaceName() . '\\' . $refClass->getName();
+            $refMemory = $refClass->getAttributes(BenchmarkMemory::class);
+            $refMemory = ($refMemory[0] ?? false) && $refMemory[0]->newInstance() instanceof BenchmarkMemory;
+            $refMemoryLimit = $refClass->getAttributes(BenchmarkMemory::class);
+            $refMemoryLimit = ($refMemoryLimit[0] ?? false) ? $refMemoryLimit[0]->newInstance()->limit : 0;
+            if($refMemoryLimit > 0 && $this->memoryLimit < $refMemoryLimit){
+                $this->memoryLimit = $refMemoryLimit;
+                ini_set("memory_limit","{$this->memoryLimit}M");
+                $this->view->getMemory($refMemoryLimit);
+            }
+            /**
+             * @var Benchmark $oMemory
+             */
+            $this->objectIterator($classFullName, $refBenchmark->count, $o);
         }
-        $classFullName = $refClass->getNamespaceName() . '\\' . $refClass->getName();
+        else {
+            $o = $refClass->newInstance();
+            $refMemory = true;
+        }
+
         $refMethods = $refClass->getMethods();
-        /**
-         * @var Benchmark $oMemory
-         */
-        $this->objectIterator($classFullName, $refBenchmark->count, $o);
+
         foreach ($refMethods as &$method){
             /**
              * @var Benchmark $benchmark
              */
-            $benchmark = $method->getAttributes(Benchmark::class)[0]->newInstance();
+            $benchmark = $method->getAttributes(Benchmark::class);
+            $benchmark = ($benchmark[0] ?? false) ? $benchmark[0]->newInstance() : false;
             if($benchmark instanceof Benchmark){
+                $this->view->getObject();
                 $memory = $this->getMethodMemoryToBool($method, $refMemory);
                 $gc = $this->getMethodGCToBool($method);
                 $params  = $this->getMethodParamsToArray($method);
@@ -105,6 +121,8 @@ abstract class PhpBenchmarkBase
             }
             $this->view->clear();
         }
+
+        $this->view->clear(true);
     }
 
     /**
@@ -125,6 +143,7 @@ abstract class PhpBenchmarkBase
     )
     : void
     {
+
         $this->gc();
         $name = explode("\\", $classFullName);
         $this->view->name = end($name);
@@ -147,6 +166,7 @@ abstract class PhpBenchmarkBase
             }
             $this->view->times[] = $et;
         }
+
         $this->view->getObject();
         $this->view->clear();
     }
@@ -174,7 +194,7 @@ abstract class PhpBenchmarkBase
     {
         $this->view->count = $count;
         $this->view->name = $method->getName();
-
+        $this->view->getObject();
         $this->gc();
 
         for ($i = 0; $i < $count; $i++){
@@ -260,5 +280,17 @@ abstract class PhpBenchmarkBase
         $params = $method->getAttributes(BenchmarkMethod::class);
         return ($params[0] ?? false) && ($arrParams = $params[0]->newInstance()) instanceof BenchmarkMethod
             ?  $arrParams->args : [];
+    }
+
+    /**
+     * @return string[]
+     * @throws \ReflectionException
+     */
+    private function findSubjects(): array
+    {
+        return array_filter(array_diff(get_declared_classes(),$this->listIgnore), function($class) {
+            $reflectionClass = new \ReflectionClass($class);
+            return !$reflectionClass->isInternal();
+        });
     }
 }

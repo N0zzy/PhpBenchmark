@@ -20,6 +20,7 @@ class Views
     public string $name = "";
     public array $times = [];
     public int|float $memory = 0;
+    public bool $isOutput = false;
 
     /**
      * @param int|float $timeNSec
@@ -75,12 +76,12 @@ class Views
      */
     public function getHeaders(): void
     {
-        $title = [];
+        $title = [""];
         $title[] = "PhpBenchmark";
         $title[] = "Php version: " . phpversion();
-        echo implode("\n", $title) . "\n";
+        echo implode("\n", $title) . "\t";
 
-        $header = [];
+        $header = ["\n"];
         array_map(function ($arr) use (&$header) {
             $header[] = count($header) < 1 || isset( $arr[1])
                 ?  $this->addWhiteSpace($arr[0], true, $arr[1])
@@ -94,7 +95,7 @@ class Views
             ["Time(avg, s/ns)"],
         ]);
 
-        echo "|" . implode("|", $header) . "|\n";
+        echo implode("|", $header) . "|\t";
     }
 
     /**
@@ -107,15 +108,19 @@ class Views
     )
     : void
     {
-        echo "|  Php Memory Limit: " . $value . "M\n";
+        echo "\n|  Php Memory Limit: " . $value . "M\t";
     }
 
     public function getObject(): void
     {
-        $body = [];
-        $tMin = sizeof($this->times) > 0 ? min($this->times) : "NaN";
-        $tMax = sizeof($this->times) > 0 ? max($this->times) : "NaN";
-        $tAvg = array_sum($this->times) / count($this->times);
+        if($this->isOutput) return;
+        $this->isOutput = true;
+
+        $body = ["\n|"];
+        $size = sizeof($this->times);
+        $tMin = $size > 0 ? min($this->times) : -1;
+        $tMax = $size > 0 ? max($this->times) : -1;
+        $tAvg = $size > 0 ? (array_sum($this->times) / count($this->times)) : -1;
         array_map( function ($arr) use (&$body) {
             $body[] = isset($arr[1])
                 ? $this->addWhiteSpace($arr[0], false, $arr[1])
@@ -125,16 +130,16 @@ class Views
             [ "(c) " . $this->name, 30 ],
             [ $this->memory, 25 ],
             [ $this->count, 20 ],
-            [ $this->getTimeToString($tMin) ],
-            [ $this->getTimeToString($tMax) ],
-            [ $this->getTimeToString($tAvg, true) ],
+            [ $tMin > 0 ? $this->getTimeToString($tMin) : "NaN" ],
+            [ $tMax > 0 ? $this->getTimeToString($tMax) : "NaN" ],
+            [ $tAvg > 0 ? $this->getTimeToString($tAvg, true) : "NaN" ],
         ]);
-        echo "|". implode("", $body) . "\n";
+        echo implode("", $body);
     }
 
     public function getMethod(): void
     {
-        $body = [];
+        $body = ["\n|"];
         $tMin = sizeof($this->times) > 0 ? min($this->times) : "NaN";
         $tMax = sizeof($this->times) > 0 ? max($this->times) : "NaN";
         $tAvg = array_sum($this->times) / count($this->times);
@@ -151,8 +156,7 @@ class Views
             [ $this->getTimeToString($tMax) ],
             [ $this->getTimeToString($tAvg, true) ],
         ]);
-        $body[] = "\n";
-        echo "|" . implode("", $body);
+        echo implode("", $body);
 
     }
 
@@ -242,9 +246,14 @@ class Views
         return str_repeat($separator, ($length < $number ? $number - $length : $number));
     }
 
-    public function clear(): void
+    public function clear(bool $all = false): void
     {
         $this->times = [];
         $this->memory = 0;
+        if( $all ){
+            $this->count = 0;
+            $this->name = "";
+            $this->isOutput = false;
+        }
     }
 }
