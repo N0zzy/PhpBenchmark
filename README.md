@@ -1,5 +1,59 @@
 # Simple Php Benchmark
 
+### Install (composer)
+```text
+composer require n0zzy/phpbenchmark
+```
+
+---
+
+### Run (for terminal/console)
+```text
+php your_php_script_benchmark
+```
+
+---
+
+### Settings (Example Run for html)
+
+```php
+#!/usr/bin/php
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+use N0zzy\PhpBenchmark\Attributes\Benchmark;
+use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
+use N0zzy\PhpBenchmark\PhpBenchmark;
+use N0zzy\PhpBenchmark\PhpBenchmarkSettings;
+use N0zzy\PhpBenchmark\Services\OutputEnum;
+use N0zzy\PhpBenchmark\Services\MemoryEnum;
+
+
+#[PhpBenchmarkSettings(settings: [
+    'output' => OutputEnum::Html,
+    'memory' => MemoryEnum::MEDIUM,
+    'gc' => false
+])]
+class Setting {}
+
+class A {
+    #[Benchmark(count: 100)]
+    #[BenchmarkMethod([
+        'class' => A::class,
+        'method' => 'a'
+    ])]
+    private function a($class, $method)
+    {
+        static $a = 0;
+        $a++;
+        $b = $class . '::' . $method;
+    }
+}
+new PhpBenchmark(Setting::class);
+```
+
+---
+
 ### Example №1: adding a class(es) and methods for the test
 
 ```php
@@ -71,53 +125,7 @@ class A {
 new PhpBenchmark();
 
 ```
-### Install (composer)
-```text
-composer require n0zzy/phpbenchmark
-```
 
-### Run (for terminal/console)
-```text
-php your_php_script_benchmark
-```
-
-### Settings (Example Run for html)
-
-```php
-#!/usr/bin/php
-<?php
-require __DIR__ . '/vendor/autoload.php';
-
-use N0zzy\PhpBenchmark\Attributes\Benchmark;
-use N0zzy\PhpBenchmark\Attributes\BenchmarkMethod;
-use N0zzy\PhpBenchmark\PhpBenchmark;
-use N0zzy\PhpBenchmark\PhpBenchmarkSettings;
-use N0zzy\PhpBenchmark\Services\OutputEnum;
-use N0zzy\PhpBenchmark\Services\MemoryEnum;
-
-
-#[PhpBenchmarkSettings(settings: [
-    'output' => OutputEnum::Html,
-    'memory' => MemoryEnum::MEDIUM,
-    'gc' => false
-])]
-class Setting {}
-
-class A {
-    #[Benchmark(count: 100)]
-    #[BenchmarkMethod([
-        'class' => A::class,
-        'method' => 'a'
-    ])]
-    private function a($class, $method)
-    {
-        static $a = 0;
-        $a++;
-        $b = $class . '::' . $method;
-    }
-}
-new PhpBenchmark(Setting::class);
-```
 
 ### Results
 ```text
